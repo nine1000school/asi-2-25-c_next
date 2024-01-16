@@ -18,12 +18,17 @@ const handle = async (req, res) => {
     return
   }
 
-  // Read => GET
+  // Read => GET (collection)
   if (req.method === "GET") {
     // READ
     const todos = await readDatabase()
 
-    res.send(todos)
+    res.send(
+      todos.map((todo, index) => ({
+        index,
+        description: todo,
+      })),
+    )
 
     return
   }
