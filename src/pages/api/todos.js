@@ -28,9 +28,6 @@ const handle = async (req, res) => {
     return
   }
 
-  // Update => PATCH
-  // Delete => DELETE
-
   res.status(404).send({ error: "Not found" })
 }
 
