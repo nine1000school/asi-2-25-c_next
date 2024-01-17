@@ -1,4 +1,5 @@
 import { readDatabase } from "@/db/readDatabase"
+import Link from "next/link"
 
 export const getServerSideProps = async () => {
   const todos = await readDatabase()
@@ -14,7 +15,9 @@ const TodosPage = ({ todos }) => (
     <ul>
       {todos.map((todo, index) => (
         <li key={index}>
-          #{index} {todo}
+          <Link href={`/todos/${index}/edit`}>
+            #{index} {todo}
+          </Link>
         </li>
       ))}
     </ul>
