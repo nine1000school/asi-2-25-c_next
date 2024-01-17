@@ -5,15 +5,25 @@ const handle = async (req, res) => {
   // Create => POST
   if (req.method === "POST") {
     // CREATE
-    const { description: todo } = req.body
-    const todos = await readDatabase()
-    const newTodos = [...todos, todo]
-    const newTodoIndex = await writeDatabase(newTodos)
+    const { description, isDone = false } = req.body
+    const db = await readDatabase()
+    const newTodo = {
+      id: db.lastId + 1,
+      description,
+      isDone,
+    }
+    const newTodos = {
+      ...db.todos,
+      [newTodo.id]: newTodo,
+    }
 
-    res.send({
-      index: newTodoIndex,
-      description: todo,
+    await writeDatabase({
+      ...db,
+      lastId: newTodo.id,
+      todos: newTodos,
     })
+
+    res.send(newTodo)
 
     return
   }
@@ -21,14 +31,9 @@ const handle = async (req, res) => {
   // Read => GET (collection)
   if (req.method === "GET") {
     // READ
-    const todos = await readDatabase()
+    const { todos } = await readDatabase()
 
-    res.send(
-      todos.map((todo, index) => ({
-        index,
-        description: todo,
-      })),
-    )
+    res.send(Object.values(todos))
 
     return
   }
