@@ -1,5 +1,7 @@
 import { readDatabase } from "@/db/readDatabase"
+import axios from "axios"
 import { ErrorMessage, Field, Form, Formik } from "formik"
+import { useRouter } from "next/router"
 import * as yup from "yup"
 
 export const getServerSideProps = async ({ params: { todoIndex } }) => {
@@ -14,16 +16,17 @@ export const getServerSideProps = async ({ params: { todoIndex } }) => {
   }
 }
 const validationSchema = yup.object({
-  email: yup.string().email().required().label("E-mail"),
-  password: yup.string().min(8).required().label("Password"),
+  description: yup.string().min(1).required().label("Description"),
 })
 const TodoEditPage = ({ todo, index }) => {
+  const router = useRouter()
   const initialValues = {
-    email: index,
-    password: "",
+    description: todo,
   }
-  const handleSubmit = (values) => {
-    console.log("SUBMITTED!", values)
+  const handleSubmit = async ({ description }) => {
+    await axios.patch(`/api/todos/${index}`, { description })
+
+    router.push("/todos")
   }
 
   if (!todo) {
@@ -40,19 +43,11 @@ const TodoEditPage = ({ todo, index }) => {
       >
         <Form noValidate className="flex flex-col gap-4">
           <Field
-            name="email"
-            type="email"
+            name="description"
             className="border-2 px-3 py-2"
-            placeholder="E-mail"
+            placeholder="Enter a description"
           />
-          <ErrorMessage name="email" className="text-sm text-red-500" />
-          <Field
-            name="password"
-            type="password"
-            className="border-2 px-3 py-2"
-            placeholder="Password"
-          />
-          <ErrorMessage name="password" className="text-sm text-red-500" />
+          <ErrorMessage name="description" className="text-sm text-red-500" />
           <button
             type="submit"
             className="bg-blue-600 active:bg-blue-700 font-semibold text-white px-3 py-2 text-lg"
