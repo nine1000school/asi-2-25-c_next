@@ -1,6 +1,10 @@
+import { Button } from "@/components/Button"
+import { Form } from "@/components/Form"
+import { FormField } from "@/components/FormField"
+import { Title } from "@/components/Title"
 import { readDatabase } from "@/db/readDatabase"
 import axios from "axios"
-import { ErrorMessage, Field, Form, Formik } from "formik"
+import { Formik } from "formik"
 import { useRouter } from "next/router"
 import * as yup from "yup"
 
@@ -35,25 +39,15 @@ const TodoEditPage = ({ todo, index }) => {
 
   return (
     <>
-      <h1 className="text-2xl font-bold mb-8">Editing todo #{index}</h1>
+      <Title>Editing todo #{index}</Title>
       <Formik
         onSubmit={handleSubmit}
         initialValues={initialValues}
         validationSchema={validationSchema}
       >
-        <Form noValidate className="flex flex-col gap-4">
-          <Field
-            name="description"
-            className="border-2 px-3 py-2"
-            placeholder="Enter a description"
-          />
-          <ErrorMessage name="description" className="text-sm text-red-500" />
-          <button
-            type="submit"
-            className="bg-blue-600 active:bg-blue-700 font-semibold text-white px-3 py-2 text-lg"
-          >
-            SUBMIT
-          </button>
+        <Form>
+          <FormField name="description" placeholder="Enter a description" />
+          <Button type="submit">SUBMIT</Button>
         </Form>
       </Formik>
     </>
