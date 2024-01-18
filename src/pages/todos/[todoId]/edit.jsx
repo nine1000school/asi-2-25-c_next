@@ -8,13 +8,12 @@ import { Formik } from "formik"
 import { useRouter } from "next/router"
 import * as yup from "yup"
 
-export const getServerSideProps = async ({ params: { todoIndex } }) => {
-  const todos = await readDatabase()
-  const todo = todos[todoIndex] || null
+export const getServerSideProps = async ({ params: { todoId } }) => {
+  const db = await readDatabase()
+  const todo = db.todos[todoId] || null
 
   return {
     props: {
-      index: todoIndex,
       todo,
     },
   }
@@ -22,13 +21,14 @@ export const getServerSideProps = async ({ params: { todoIndex } }) => {
 const validationSchema = yup.object({
   description: yup.string().min(1).required().label("Description"),
 })
-const TodoEditPage = ({ todo, index }) => {
+const TodoEditPage = ({ todo }) => {
   const router = useRouter()
   const initialValues = {
-    description: todo,
+    description: todo.description,
+    isDone: todo.isDone,
   }
-  const handleSubmit = async ({ description }) => {
-    await axios.patch(`/api/todos/${index}`, { description })
+  const handleSubmit = async (data) => {
+    await axios.patch(`/api/todos/${todo.id}`, data)
 
     router.push("/todos")
   }
@@ -39,7 +39,7 @@ const TodoEditPage = ({ todo, index }) => {
 
   return (
     <>
-      <Title>Editing todo #{index}</Title>
+      <Title>Editing todo #{todo.id}</Title>
       <Formik
         onSubmit={handleSubmit}
         initialValues={initialValues}
@@ -47,6 +47,10 @@ const TodoEditPage = ({ todo, index }) => {
       >
         <Form>
           <FormField name="description" placeholder="Enter a description" />
+          <label className="flex gap-2">
+            <FormField name="isDone" type="checkbox" />
+            <span>Done</span>
+          </label>
           <Button type="submit">SUBMIT</Button>
         </Form>
       </Formik>
