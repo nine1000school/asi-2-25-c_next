@@ -49,7 +49,7 @@ const handle = async (req, res) => {
       todos,
     })
 
-    res.send(todo)
+    setTimeout(() => res.send(todo), 3000)
 
     return
   }
