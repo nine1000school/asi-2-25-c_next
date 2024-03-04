@@ -1,28 +1,14 @@
-import { readDatabase } from "@/db/readDatabase"
-import { writeDatabase } from "@/db/writeDatabase"
+import { createRoute } from "@/api/createRoute"
+import { TodoModel } from "@/db/models/TodoModel"
 
-const handle = async (req, res) => {
+const handle = createRoute(async (req, res) => {
   // Create => POST
   if (req.method === "POST") {
     // CREATE
     const { description, isDone = false } = req.body
-    const db = await readDatabase()
-    const newTodo = {
-      id: db.lastId + 1,
-      description,
-      isDone,
-    }
-    const newTodos = {
-      ...db.todos,
-      [newTodo.id]: newTodo,
-    }
+    const newTodo = new TodoModel({ description, isDone })
 
-    await writeDatabase({
-      ...db,
-      lastId: newTodo.id,
-      todos: newTodos,
-    })
-
+    await newTodo.save()
     res.send(newTodo)
 
     return
@@ -31,14 +17,14 @@ const handle = async (req, res) => {
   // Read => GET (collection)
   if (req.method === "GET") {
     // READ
-    const { todos } = await readDatabase()
+    const todos = await TodoModel.find()
 
-    res.send(Object.values(todos))
+    res.send(todos)
 
     return
   }
 
   res.status(404).send({ error: "Not found" })
-}
+})
 
 export default handle
