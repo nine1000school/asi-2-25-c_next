@@ -2,15 +2,15 @@ import { Button } from "@/components/Button"
 import { Form } from "@/components/Form"
 import { FormField } from "@/components/FormField"
 import { Title } from "@/components/Title"
-import { readDatabase } from "@/db/readDatabase"
 import axios from "axios"
 import { Formik } from "formik"
 import { useRouter } from "next/router"
 import * as yup from "yup"
 
 export const getServerSideProps = async ({ params: { todoId } }) => {
-  const db = await readDatabase()
-  const todo = db.todos[todoId] || null
+  const { data: todo } = await axios(
+    `http://localhost:3000/api/todos/${todoId}`,
+  )
 
   return {
     props: {
@@ -28,7 +28,7 @@ const TodoEditPage = ({ todo }) => {
     isDone: todo.isDone,
   }
   const handleSubmit = async (data) => {
-    await axios.patch(`/api/todos/${todo.id}`, data)
+    await axios.patch(`/api/todos/${todo._id}`, data)
 
     router.push("/todos")
   }
@@ -39,7 +39,7 @@ const TodoEditPage = ({ todo }) => {
 
   return (
     <>
-      <Title>Editing todo #{todo.id}</Title>
+      <Title>Editing todo #{todo._id}</Title>
       <Formik
         onSubmit={handleSubmit}
         initialValues={initialValues}

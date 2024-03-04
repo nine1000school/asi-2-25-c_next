@@ -1,6 +1,7 @@
+import { createRoute } from "@/api/createRoute"
 import { TodoModel } from "@/db/models/TodoModel"
 
-const handle = async (req, res) => {
+const handle = createRoute(async (req, res) => {
   const { todoId } = req.query
   const todo = await TodoModel.findById(todoId)
 
@@ -41,6 +42,6 @@ const handle = async (req, res) => {
   }
 
   res.status(404).send({ error: "Not found" })
-}
+})
 
 export default handle

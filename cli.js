@@ -4,8 +4,6 @@ import chalk from "chalk"
 import { config } from "dotenv"
 import mongoose from "mongoose"
 import { TodoModel } from "./src/db/models/TodoModel.js"
-// import { readDatabase } from "./src/db/readDatabase.js"
-// import { writeDatabase } from "./src/db/writeDatabase.js"
 
 config({ path: ".env.local" })
 

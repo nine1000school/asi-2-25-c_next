@@ -1,16 +1,15 @@
 import { Button } from "@/components/Button"
-import { readDatabase } from "@/db/readDatabase"
 import axios from "axios"
 import clsx from "clsx"
 import Link from "next/link"
 import { useState } from "react"
 
 export const getServerSideProps = async () => {
-  const { todos } = await readDatabase()
+  const { data: todos } = await axios("http://localhost:3000/api/todos")
 
   return {
     props: {
-      todos: Object.values(todos),
+      todos,
     },
   }
 }
@@ -23,7 +22,7 @@ const TodosPage = ({ todos: initialTodos }) => {
   const handleDelete = (id) => async () => {
     setToBeDeletedIt(id)
     await axios.delete(`/api/todos/${id}`)
-    setTodos(todos.filter((todo) => todo.id !== id))
+    setTodos(todos.filter((todo) => todo._id !== id))
   }
 
   return (
@@ -32,27 +31,27 @@ const TodosPage = ({ todos: initialTodos }) => {
         <tbody>
           {todos.map((todo) => (
             <tr
-              key={todo.id}
+              key={todo._id}
               className={clsx(
                 "odd:bg-slate-100 duration-500 transition-opacity",
                 {
-                  "opacity-40": todo.id === toBeDeleteId,
+                  "opacity-40": todo._id === toBeDeleteId,
                 },
               )}
             >
-              <TableCell>{todo.id}</TableCell>
+              <TableCell>{todo._id}</TableCell>
               <TableCell>{todo.isDone ? "✅" : ""}</TableCell>
               <TableCell className="w-full">{todo.description}</TableCell>
               <TableCell>
                 <Button
-                  disabled={todo.id === toBeDeleteId}
-                  onClick={handleDelete(todo.id)}
+                  disabled={todo._id === toBeDeleteId}
+                  onClick={handleDelete(todo._id)}
                 >
                   DELETE
                 </Button>
               </TableCell>
               <TableCell>
-                <Link href={`/todos/${todo.id}/edit`}>Edit</Link>
+                <Link href={`/todos/${todo._id}/edit`}>Edit</Link>
               </TableCell>
             </tr>
           ))}
