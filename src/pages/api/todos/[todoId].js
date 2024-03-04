@@ -1,10 +1,8 @@
-import { readDatabase } from "@/db/readDatabase"
-import { writeDatabase } from "@/db/writeDatabase"
+import { TodoModel } from "@/db/models/TodoModel"
 
 const handle = async (req, res) => {
-  const todoId = Number.parseInt(req.query.todoId, 10)
-  const db = await readDatabase()
-  const todo = db.todos[todoId]
+  const { todoId } = req.query
+  const todo = await TodoModel.findById(todoId)
 
   if (!todo) {
     res.status(404).send({ error: "Not found" })
@@ -15,41 +13,29 @@ const handle = async (req, res) => {
   // Read => GET (item)
   if (req.method === "GET") {
     res.send(todo)
+
+    return
   }
 
   // Update => PATCH
   if (req.method === "PATCH") {
     const { description, isDone } = req.body
-    const updatedTodo = {
-      ...todo,
-      description: description ?? todo.description,
-      isDone,
-    }
-    const newTodos = {
-      ...db.todos,
-      [todoId]: updatedTodo,
-    }
 
-    await writeDatabase({ ...db, todos: newTodos })
+    todo.description = description || todo.description
+    todo.isDone = isDone ?? todo.isDone
 
-    res.send(updatedTodo)
+    await todo.save()
+
+    res.send(todo)
 
     return
   }
 
   // Delete => DELETE
   if (req.method === "DELETE") {
-    const {
-      // eslint-disable-next-line no-unused-vars
-      todos: { [todoId]: _, ...todos },
-    } = db
+    await TodoModel.deleteOne({ _id: todoId })
 
-    await writeDatabase({
-      ...db,
-      todos,
-    })
-
-    setTimeout(() => res.send(todo), 3000)
+    res.send(todo)
 
     return
   }
